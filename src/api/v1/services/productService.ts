@@ -1,4 +1,4 @@
-export type ProductCategory = "electronics" | "clothing" | "food" | "tools" | "other";
+export type Category = "electronics" | "clothing" | "food" | "tools" | "other";
 
 export interface Product {
   id: string;
@@ -6,28 +6,28 @@ export interface Product {
   sku: string;
   quantity: number;
   price: number;
-  category: ProductCategory;
-  createdAt: Date;
-  updatedAt: Date;
+  category: Category;
+  createdAt: string;
 }
+
+export type CreateProductInput = Omit<Product, "id" | "createdAt">;
 
 let products: Product[] = [];
 
-export const getAll = () => products;
-
-export const getById = (id: string) => products.find((p) => p.id === id);
-
-export const create = (input: Omit<Product, "id" | "createdAt">) => {
+// POST /products
+export const createProduct = async (input: CreateProductInput): Promise<Product> => {
   const newProduct: Product = {
     id: `${Date.now()}-${Math.floor(Math.random() * 100000)}`,
     createdAt: new Date().toISOString(),
     ...input,
   };
+
   products.push(newProduct);
   return newProduct;
 };
 
-export const remove = (id: string) => {
+// DELETE /products/:id
+export const deleteProduct = async (id: string): Promise<boolean> => {
   const before = products.length;
   products = products.filter((p) => p.id !== id);
   return products.length < before;

@@ -1,20 +1,16 @@
-import express, { Express } from "express";
-import morgan from "morgan";
+import express from "express";
+import productRoutes from "./api/v1/routes/productRoutes";
+import { HTTP_STATUS } from "./constants/httpConstants";
 
-// Initialize Express application
-const app: Express = express();
+const app = express();
+app.use(express.json());
 
-// Use Morgan for HTTP request logging
-app.use(morgan("combined"));
+app.use("/api/v1", productRoutes);
 
-// Define a health route
-app.get("/api/v1/health", (req, res) => {
-    res.json({
-        status: "OK",
-        uptime: process.uptime(),
-        timestamp: new Date().toISOString(),
-        version: "1.0.0",
-    });
+// simple error handler
+app.use((err: unknown, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const message = err instanceof Error ? err.message : "Unknown error";
+  res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message });
 });
 
 export default app;
